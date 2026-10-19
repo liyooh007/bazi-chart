@@ -233,6 +233,9 @@ ODD_LINES = {
          lambda c: GAN_VERSE[c["gan"]],
          lambda c: GAN_VERSE_NOTE[c["gan"]])],
     3: [
+        (lambda c: c["kind"] == "专旺格",
+         lambda c: _pattern7(c, "势独尊"),
+         lambda c: f"{c['pattern']}（专旺）：一行独旺、气势专一，贵在顺其旺势、忌逆势强克"),
         (lambda c: c["kind"] == "正格" and c["score"] >= 55,
          lambda c: _pattern7(c, "身气稳"),
          lambda c: f"{c['pattern']}，日主 {c['score']:.0f} 分身强，月令提纲有力"),
@@ -247,6 +250,9 @@ ODD_LINES = {
          lambda c: f"成{c['pattern']}（{c['kind']}），气势偏于一方，贵在顺势"),
     ],
     5: [
+        (lambda c: c["kind"] == "专旺格",
+         lambda c: "顺其旺势泄为珍",
+         lambda c: "专旺格喜印比帮扶、食伤顺泄，忌财官逆势；立身宜顺势而为、忌硬碰"),
         (lambda c: c["lead"] == "官杀",
          lambda c: "功名有路凭" + c["yong"] + "引",
          lambda c: f"十神以官杀为主，用神{c['yong']}，宜{WUXING_DIRECTION[c['yong']]}、功名规矩之途"),
@@ -261,6 +267,9 @@ ODD_LINES = {
          lambda c: f"用神为{c['yong']}，行业、方位、颜色皆宜取{c['yong']}气"),
     ],
     7: [
+        (lambda c: c["kind"] == "专旺格",
+         lambda c: "逆行财官莫轻亲",
+         lambda c: "专旺行运顺食伤、印比则吉，逢财官旺地逆势多阻，行运取舍与正格相反"),
         (lambda c: c["yun_early"] + 0.4 <= c["yun_mid"] and c["yun_late"] >= 0.3,
          lambda c: "中年发迹晚尤昌",
          lambda c: f"大运先抑后扬：早{c['yun_early']:+.1f}/中{c['yun_mid']:+.1f}/晚{c['yun_late']:+.1f}，中年后渐入佳境"),
@@ -432,6 +441,8 @@ def _sample_contexts():
         clone(strong_word="身强", score=62),
         clone(strong_word="身弱", score=38),
         clone(kind="从格", pattern="从财格", phrase="从财顺势", lead="财星"),
+        clone(kind="专旺格", pattern="润下格", phrase="润下通达", lead="比劫",
+              strong_word="身旺", score=80),
         clone(tianyi=True, noble=True, wencang=True),
         clone(blade=True),
         clone(flower=True),

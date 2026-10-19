@@ -28,7 +28,8 @@ from .pillars import (
 from .pattern import Pattern, useful_god
 from .qiongtong import qiongtong
 from .shensha import ShenShaResult, find_shensha
-from .ziping import geju_cheng_bai, guan_sha_hun_za, cong_quality
+from .ziping import (geju_cheng_bai, guan_sha_hun_za, cong_quality,
+                     alternative_patterns)
 
 __all__ = ["BaziChart"]
 
@@ -47,6 +48,7 @@ class BaziChart:
     tz_hours: float = CST_OFFSET
     name: str = ""
     day_rollover: str = "zi"
+    show_alt: bool = True        # 多格局并行：并列展示有争议的备选格局（如专旺/润下）
 
     # -- 派生结果（延迟计算） --
     four_pillars: FourPillars = None
@@ -161,6 +163,7 @@ class BaziChart:
             "子平格局成败": geju_cheng_bai(self),
             "官杀混杂": guan_sha_hun_za(self),
             "从格清浊": cong_quality(self),
+            "备选格局": alternative_patterns(self) if self.show_alt else [],
             "神煞": self.shensha.to_dict(),
             "起运": self.qiyun(),
             "命局评分": self.rating(),
@@ -272,6 +275,10 @@ class BaziChart:
         _cq = cong_quality(self)
         if _cq["is_cong"]:
             L.append(f"  从格清浊：{_cq['quality']} —— {_cq['reason']}")
+        # 多格局并行：有争议的备选格局（专旺/润下等），只陈列不覆盖主判定
+        if self.show_alt:
+            for a in alternative_patterns(self):
+                L.append(f"  备选格局（流派之争）：{a['alt']} —— {a['reason']}")
 
         h2("神煞")
         ji = "、".join(str(s) for s in self.shensha.group("吉")) or "—"

@@ -242,3 +242,86 @@ def cong_quality(chart) -> dict:
             "root_pct": round(root_pct, 1),
             "reason": "日主尚有" + "、".join(bits) + "，不能尽从，格有瑕疵，逢根气之运多反复"}
 
+
+# --------------------------------------------------------------------------- #
+# 专旺纯净度 / 备选格局（多格局并行）
+# --------------------------------------------------------------------------- #
+# 五行 -> 专旺格名；破格关系：财(我克)、官杀(克我)透干即不纯
+_ZW_NAME = {"木": "曲直格", "火": "炎上格", "土": "稼穑格",
+            "金": "从革格", "水": "润下格"}
+
+
+def zhuanwang_purity(chart) -> dict:
+    """专旺（一行独旺）纯净度诊断。
+
+    专旺格要求日主本气极旺、印比成群且**无财官透干破格**。实践中同一命局
+    常被两派争论（如润下格透丁火财星，严格派认为破局不入，宽松派仍取）。
+    本函数只摆事实、不替流派拍板：
+
+    * ``eligible``  气势上够不够格（身极旺 score>=72 且本气+印 >= 65%、得令）
+    * ``flaws``     破格瑕疵（财/官杀透干、本气被冲等）
+    * ``strict_ok`` 严格派（要求无财官透干）认不认
+    * ``loose_ok``  宽松派认不认
+    """
+    from .constants import (SHISHEN_GROUP, shishen,
+                            relations as _rel)
+    fp, st, pw = chart.four_pillars, chart.strength, chart.power.percent
+    dw = fp.day.gan_wuxing
+    from .constants import sheng_wo
+    yin = sheng_wo(dw)
+    core = pw.get(dw, 0) + pw.get(yin, 0)      # 本气 + 印
+
+    de_ling = st["de_ling"].startswith("得令")
+    eligible = st["score"] >= 72 and de_ling and core >= 65
+
+    flaws = []
+    # 天干透出财 / 官杀？
+    for p, lab in zip(fp.pillars, "年月日时"):
+        if lab == "日":
+            continue
+        grp = SHISHEN_GROUP[shishen(fp.day.gan, p.gan)]
+        if grp == "财星":
+            flaws.append(f"财星「{p.gan}」透{lab}干")
+        elif grp == "官杀":
+            flaws.append(f"官杀「{p.gan}」透{lab}干")
+    # 本气支被冲
+    for p, lab in zip(fp.pillars, "年月日时"):
+        if p.zhi_wuxing == dw and lab != "日":
+            if "六冲" in _rel(p.zhi, fp.day.zhi):
+                flaws.append(f"{lab}支本气逢冲")
+
+    strict_ok = eligible and not flaws
+    loose_ok = eligible                        # 宽松派：气势够即可，透财官作瑕疵看
+    return {
+        "ge": _ZW_NAME[dw], "wuxing": dw, "core_pct": round(core, 1),
+        "score": st["score"], "eligible": eligible, "flaws": flaws,
+        "strict_ok": strict_ok, "loose_ok": loose_ok,
+    }
+
+
+def alternative_patterns(chart) -> list[dict]:
+    """多格局并行：返回主格局之外、有争议的备选格局（当前只列专旺候选）。
+
+    主格局（扶抑/从/化，``chart.pattern``）永远保留不动；这里只附加"另一派
+    可能怎么取"，供命书并列展示、不互相覆盖。无备选时返回空列表。
+    """
+    out = []
+    zw = zhuanwang_purity(chart)
+    if zw["eligible"]:
+        if chart.pattern.kind == "专旺格":
+            # 主判定已取专旺：反报扶抑视角下的破格争议（若有瑕疵）
+            if zw["flaws"]:
+                out.append({"alt": "按正格（扶抑）另论",
+                            "reason": "主局已取" + zw["ge"] + "，但严格派以"
+                                      + "、".join(zw["flaws"]) + "为破格，主张不取专旺",
+                            "strict_side": "不取专旺"})
+        else:
+            # 主判定是正格/其他：报专旺候选
+            out.append({"alt": zw["ge"] + "（专旺）",
+                        "strict_ok": zw["strict_ok"], "loose_ok": zw["loose_ok"],
+                        "reason": "本气+印达" + f"{zw['core_pct']:.0f}%、身极旺，宽松派可取专旺"
+                                  + ("；但" + "、".join(zw["flaws"]) + "，严格派不取" if zw["flaws"]
+                                     else "；无财官透干破格，两派皆可")})
+    return out
+
+

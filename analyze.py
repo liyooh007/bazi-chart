@@ -10,6 +10,7 @@ from __future__ import annotations
 from .constants import (
     TIANGAN, DIZHI, WUXING, GAN_WUXING, ZHI_WUXING, ZANGGAN,
     WUXING_CAREER, WUXING_COLOR, WUXING_DIRECTION, WUXING_ORGAN,
+    WUXING_SYMPTOM,
     WUXING_PERSONALITY, WUXING_SEASON, shishen, sheng, ke, sheng_wo, ke_wo, ZHI_HE, changsheng,
 )
 
@@ -308,10 +309,10 @@ def health(fp, pattern, power, strength) -> dict:
     out["五行分布"] = "、".join(f"{w}{v:.1f}%" for w, v in ranked)
     if weakest:
         out["偏枯（弱）"] = "、".join(
-            f"{w}弱 → 需留意{WUXING_ORGAN[w]}" for w in weakest)
+            f"{w}弱（{WUXING_ORGAN[w]}）→ {WUXING_SYMPTOM[w]['弱']}" for w in weakest)
     if strongest:
         out["偏旺"] = "、".join(
-            f"{w}过旺 → 易见{WUXING_ORGAN[w]}之疾或情志过激" for w in strongest)
+            f"{w}过旺（{WUXING_ORGAN[w]}）→ {WUXING_SYMPTOM[w]['旺']}" for w in strongest)
     # 日主与月令
     dw = fp.day.gan_wuxing
     if strength["score"] <= 40:
