@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 from .constants import (
-    TIANGAN, DIZHI, WUXING, GAN_WUXING, ZHI_WUXING, ZANGGAN,
+    TIANGAN, DIZHI, GAN_WUXING, ZHI_WUXING, ZANGGAN,
     WUXING_CAREER, WUXING_COLOR, WUXING_DIRECTION, WUXING_ORGAN,
     WUXING_SYMPTOM,
     WUXING_PERSONALITY, WUXING_SEASON, shishen, sheng, ke, sheng_wo, ke_wo, ZHI_HE, changsheng,
@@ -38,10 +38,6 @@ SHISHEN_TRAIT = {
     "七杀": "果敢有魄力、能抗压、宜制不宜纵", "正官": "守规重责、自律上进、宜体制内发展",
     "偏印": "思维独特、专精偏门、略孤僻", "正印": "仁厚好学、重名誉、得长辈之助",
 }
-
-
-def _pct(power) -> dict[str, float]:
-    return power.percent
 
 
 def _group_power(fp, power, group: str) -> float:

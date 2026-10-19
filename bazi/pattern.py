@@ -93,7 +93,6 @@ def determine_pattern(fp, strength: dict, power) -> Pattern:
 
     if score <= 28:
         # 从弱：看谁最强
-        dg_group = {"比劫": strength["support"]}
         star = max(("财星", "官杀", "食伤"), key=lambda g: _group_power(fp, power, g))
         gp = _group_power(fp, power, star)
         if gp >= 25:

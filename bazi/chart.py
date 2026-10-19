@@ -17,8 +17,8 @@ from datetime import datetime
 
 from .astro import CST_OFFSET
 from .constants import (
-    TIANGAN, DIZHI, WUXING, GAN_WUXING, ZHI_WUXING, SHISHEN,
-    shishen, sheng, ke, nayin, constellation,
+    TIANGAN, DIZHI, WUXING, GAN_WUXING, ZHI_WUXING,
+    shishen, constellation,
 )
 from .fortune import (DaYun, LiuNian, dayun_at, dayun_list, start_age,
                       liunian_of, liuyue_of)

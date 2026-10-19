@@ -15,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .constants import (
-    TIANGAN, DIZHI, nayin, LUSHEN, YANGREN,
+    DIZHI, nayin, LUSHEN, YANGREN,
 )
 
 __all__ = ["ShenSha", "find_shensha", "shensha_score", "liunian_shensha"]
@@ -147,7 +147,7 @@ class ShenShaResult:
 # --------------------------------------------------------------------------- #
 # 查神煞
 # --------------------------------------------------------------------------- #
-def find_shensha(fp, *, include_gan: bool = True) -> ShenShaResult:
+def find_shensha(fp) -> ShenShaResult:
     """查四柱神煞。``fp`` 为 :class:`bazi.pillars.FourPillars`。"""
     res = ShenShaResult()
     pillars = {"年": fp.year, "月": fp.month, "日": fp.day, "时": fp.hour}
@@ -296,10 +296,6 @@ def shensha_score(res: ShenShaResult) -> float:
 # --------------------------------------------------------------------------- #
 # 流年神煞
 # --------------------------------------------------------------------------- #
-_LIUYUE_SHENSHA = {
-    # 流年支相对生年支的三合序：太岁、丧门、太阴、官符、死符、岁破、龙德、白虎、福德、吊客、病符
-    # 以"年支"为基准顺行（通行简化版）
-}
 _LN_NAMES = ("太岁", "太阳", "丧门", "太阴", "官符", "死符", "岁破",
              "龙德", "白虎", "福德", "吊客", "病符")
 

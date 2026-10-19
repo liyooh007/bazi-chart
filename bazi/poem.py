@@ -145,7 +145,8 @@ def chart_rating(chart) -> dict:
             ge -= 2                  # 五行有缺，格局难纯
         if 40 <= chart.strength["score"] <= 60:
             ge += 2                  # 中和为贵
-    d["格局清浊"] = float(ge)
+    # 格局项实现上限 18，标称 20：等比放大到 20 分量纲
+    d["格局清浊"] = round(float(ge) * 20.0 / 18.0, 1)
     # 调候：先看《穷通宝鉴》逐日干×月令的首要调候用神在命局是否得力；
     # 该五行透出/坐支得地即暖燥寒润得宜（满分），仅力量够 8% 给半分，缺失最低分。
     from .qiongtong import qiongtong_wuxing
@@ -153,13 +154,14 @@ def chart_rating(chart) -> dict:
     if qw:
         pw = qw["primary"]
         rooted = any(pl.gan_wuxing == pw or pl.zhi_wuxing == pw for pl in fp.pillars)
-        d["调候寒暖"] = 7.0 if rooted else (5.0 if power.percent.get(pw, 0) >= 8 else 3.0)
+        tiaohou = 10.0 if rooted else (7.0 if power.percent.get(pw, 0) >= 8 else 4.0)
     else:
-        d["调候寒暖"] = 7.0 if (not p.tiaohou or power.percent.get(p.tiaohou, 0) >= 8) else 3.0
+        tiaohou = 10.0 if (not p.tiaohou or power.percent.get(p.tiaohou, 0) >= 8) else 4.0
+    d["调候寒暖"] = tiaohou
     d["神煞吉凶"] = round(max(0.0, min(10.0, 5 + chart.shensha.score * 0.8)), 1)
     yun = (_avg(dys, slice(0, 3)) + _avg(dys, slice(3, 6)) + _avg(dys, slice(6, 10))) / 3
     d["行运辅成"] = round(max(0.0, min(15.0, 7.5 + yun * 2.6)), 1)
-    total = round(sum(d.values()), 1)
+    total = round(min(100.0, sum(d.values())), 1)
     grade, comment = next((g[1], g[2]) for g in GRADES if total >= g[0])
     return {"总分": total, "分项": d, "评级": grade, "评级说明": comment,
             "大运": {"早年": _avg(dys, slice(0, 3)), "中年": _avg(dys, slice(3, 6)),
@@ -388,9 +390,6 @@ def verify_library() -> tuple[int, list[str]]:
     """校验诗库：所有成句 7 字；偶句末字落在所声明韵部。"""
     errs = []
     n = 0
-    # 奇句：日干句 + 用典型上下文激活各条件句（含 2/3/4 字格局短语）
-    phrase_lens = {2, 3, 4}
-    seen_phrase = set()
     for gan in GAN_VERSE:
         if len(GAN_VERSE[gan]) != 7:
             errs.append(f"日干句非7字：{GAN_VERSE[gan]}")

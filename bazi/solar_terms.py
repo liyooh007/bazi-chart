@@ -24,15 +24,18 @@ __all__ = [
     "MonthInfo", "jie_distance", "next_jie", "prev_jie",
 ]
 
-_CACHE: dict[tuple[int, float], dict[str, datetime]] = {}
+from functools import lru_cache
+
+_CACHE_CAP = 256
 
 
+@lru_cache(maxsize=_CACHE_CAP)
 def all_terms(year: int, tz_hours: float = CST_OFFSET) -> dict[str, datetime]:
-    """某公历年内的 24 节气时刻（含 1 月的小寒、大寒）。"""
-    key = (year, tz_hours)
-    if key not in _CACHE:
-        _CACHE[key] = terms_of_year(year, tz_hours)
-    return _CACHE[key]
+    """某公历年内的 24 节气时刻（含 1 月的小寒、大寒）。
+
+    ponytail: LRU 256 年；作为常驻库按年/时区查询时上限可控，需要再大调 _CACHE_CAP。
+    """
+    return terms_of_year(year, tz_hours)
 
 
 def term_time(year: int, name: str, tz_hours: float = CST_OFFSET) -> datetime:

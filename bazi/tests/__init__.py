@@ -344,10 +344,12 @@ def test_consistency(rep: Report, samples: int = 400, seed: int = 20240210) -> N
 
     rng = random.Random(seed)
     bad = []
+    import calendar
     for _ in range(samples):
         y = rng.randint(1900, 2100)
         m = rng.randint(1, 12)
-        d = rng.randint(1, 28)
+        # 覆盖月末/闰日（含 29/30/31 号），不再只取 1–28
+        d = rng.randint(1, calendar.monthrange(y, m)[1])
         hh = rng.randint(0, 23)
         gender = rng.choice(("男", "女"))
         chart = BaziChart(y, m, d, hh, 0, gender=gender)

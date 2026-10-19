@@ -11,18 +11,15 @@
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
-from typing import Iterable
+from datetime import datetime, timedelta
 
 from . import solar_terms
 from .astro import jdn_from_date, equation_of_time, CST_OFFSET
 from .constants import (
     TIANGAN, DIZHI, GAN_WUXING, ZHI_WUXING, WUXING,
-    ZANGGAN, ZANGGAN_WEIGHT, GAN_YANG, SHISHEN, SHISHEN_GROUP, changsheng, ganzhi, ganzhi_index, nayin, shishen,
+    ZANGGAN, ZANGGAN_WEIGHT, GAN_YANG, SHISHEN, SHISHEN_GROUP, changsheng, ganzhi_index, nayin, shishen,
     xunkong, sheng, ke, sheng_wo, ke_wo, relations, zhi_hour,
-    ZHI_HE, ZHI_CHONG, ZHI_HAI,
 )
 
 __all__ = [
@@ -342,7 +339,7 @@ def wuxing_balance(fp: FourPillars) -> WuXingPower:
     # 天干
     for label, p in zip(("年干", "月干", "日干", "时干"), fp.pillars):
         wx = p.gan_wuxing
-        w = GAN_WEIGHT * (1.0 if label != "日干" else 1.0)
+        w = GAN_WEIGHT
         scores[wx] += w
         detail[wx].append(f"{label}{p.gan}({w:.1f})")
 

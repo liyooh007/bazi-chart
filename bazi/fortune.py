@@ -19,7 +19,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from . import solar_terms
-from .astro import CST_OFFSET
 from .constants import (
     TIANGAN, DIZHI, ganzhi, shishen, relations, changsheng,
     GAN_WUXING, ZHI_WUXING, JIE_TERMS, JIE_TO_MONTH_ZHI,
