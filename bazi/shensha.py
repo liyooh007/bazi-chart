@@ -312,8 +312,10 @@ def liunian_shensha(year_zhi: str, natal_year_zhi: str) -> list[tuple[str, str]]
     chong = DIZHI[(DIZHI.index(natal_year_zhi) + 6) % 12]
     if year_zhi == chong:
         out.append(("冲太岁", "凶"))
-    # 天喜（以年支查）
-    tianxi = DIZHI[(DIZHI.index(natal_year_zhi) + 6) % 12]
+    # 天喜：红鸾之对冲（红鸾以年支查表，非六冲）
+    hongluan = {"子": "卯", "丑": "寅", "寅": "丑", "卯": "子", "辰": "亥", "巳": "戌",
+                "午": "酉", "未": "申", "申": "未", "酉": "午", "戌": "巳", "亥": "辰"}
+    tianxi = DIZHI[(DIZHI.index(hongluan[natal_year_zhi]) + 6) % 12]
     if year_zhi == tianxi:
         out.append(("天喜", "吉"))
     return out

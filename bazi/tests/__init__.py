@@ -536,6 +536,21 @@ def test_range_guards(rep: Report) -> None:
 # --------------------------------------------------------------------------- #
 # 入口
 # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# 8. 月令加权方向 & 流年天喜（P1/P2 回归）
+# --------------------------------------------------------------------------- #
+def test_weight_tianxi(rep: Report) -> None:
+    from ..shensha import liunian_shensha
+
+    # P2：子年生人，天喜在酉（红鸾卯之冲），冲太岁在午；二者不可同位
+    names = {n for n, _ in liunian_shensha("酉", "子")}
+    rep.check("天喜" in names and "冲太岁" not in names,
+              "流年神煞：子年生人遇酉年为天喜（非冲太岁）", f"得 {sorted(names)}")
+    names2 = {n for n, _ in liunian_shensha("午", "子")}
+    rep.check("冲太岁" in names2 and "天喜" not in names2,
+              "流年神煞：子年生人遇午年为冲太岁（非天喜）", f"得 {sorted(names2)}")
+
+
 SECTIONS = (
     ("一、节气精度（对照 JPL DE441）", test_solar_terms),
     ("二、农历转换（年表一致性 / 逐日往返 / 春节闰月）", test_lunar),
@@ -544,7 +559,8 @@ SECTIONS = (
     ("五、边界条件（立春 / 子时 / 真太阳时）", test_boundaries),
     ("六、随机一致性（排盘不变式）", test_consistency),
     ("七、命理诗生成", test_poem),
-    ("八、范围保护", test_range_guards),
+    ("八、月令加权与流年神煞（P1/P2 回归）", test_weight_tianxi),
+    ("九、范围保护", test_range_guards),
 )
 
 

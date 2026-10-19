@@ -78,6 +78,7 @@ def geju_cheng_bai(chart) -> dict:
     变格（专旺/从/化/禄刃）返回 kind 标注、verdict="不属正格成败"，不硬判。
     """
     fp, pat = chart.four_pillars, chart.pattern
+    from .pattern import _tou_gan
     if pat.kind != "正格" or pat.name not in _GE_RULES:
         return {"ge": pat.name, "kind": pat.kind,
                 "verdict": "不属正格成败（变格/禄刃另有专论）",
@@ -88,8 +89,8 @@ def geju_cheng_bai(chart) -> dict:
     tou_groups = _tou_groups(fp)       # 仅天干透出者
     ge_group, ge_gan = _ge_shen_shishen(fp)
 
-    # 格神是否透干（在年月日时天干）
-    tou = ge_gan in {p.gan for p in fp.pillars}
+    # 格神是否透干（只看年/月/时三干，与 _tou_groups 口径一致）
+    tou = ge_gan in _tou_gan(fp)
 
     # 相神：命局出现即可；破格神：必须透干才算"明破"（藏支只记隐患，不重罚）
     xiang = [x for x in rule["xiang"] if x in present]

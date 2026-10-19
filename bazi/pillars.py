@@ -357,9 +357,9 @@ def wuxing_balance(fp: FourPillars) -> WuXingPower:
     for wx in WUXING:
         if wx == month_wx:
             scores[wx] *= 1.2
-        elif ke(wx) == month_wx:            # 被月令所克
+        elif ke_wo(wx) == month_wx:        # 被月令所克，受抑最重
             scores[wx] *= 0.85
-        elif ke_wo(month_wx) == wx:         # 克月令者稍抑
+        elif ke(wx) == month_wx:           # 克月令者，稍抑
             scores[wx] *= 0.95
 
     total = sum(scores.values()) or 1.0
