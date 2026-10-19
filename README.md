@@ -28,6 +28,7 @@
 - 📈 **大运/流年/流月**：顺排逆排、起运精确到小数岁、支持自定义流年区间
 - 🪶 **命理诗与评分**：七言八句、逐句可核查；0–100 六项综合评分
 - 💻 **跨平台**：Linux / Windows / macOS，树莓派 5 原生可跑
+- 🤖 **MCP server**：内置 `bazi-mcp`（JSON-RPC stdio，零依赖），4 个工具供 Claude Desktop 等 AI 客户端调用，只返回确定性排盘事实
 - 🔒 **纯本地离线**：无网络请求、无大模型调用、无第三方运行依赖
 
 ---
@@ -193,6 +194,36 @@ for line in r.lines:
     print(line.text, "←", line.note)
 print(chart_rating(c))
 ```
+
+---
+
+## 🤖 MCP（供 AI Agent 调用）
+
+内置一个纯标准库的 MCP stdio server，零第三方依赖，**只返回确定性排盘事实，吉凶解读交给宿主模型**（facts only）。
+
+```bash
+bazi-mcp            # pip 安装后
+python -m bazi.mcp_server   # 源码目录
+```
+
+Claude Desktop 配置：
+
+```json
+{
+  "mcpServers": {
+    "bazi": { "command": "bazi-mcp" }
+  }
+}
+```
+
+| 工具 | 作用 |
+|---|---|
+| `bazi_chart` | 四柱、藏干、十神、纳音、五行旺衰、格局用神、穷通宝鉴、子平成败、神煞、起运与十步大运（`birth_year/month/day/hour`、`longitude` 等参数） |
+| `bazi_liunian` | 某公历年流年：干支、十神、与原柱刑冲合害、流年神煞、所在大运 |
+| `bazi_liuyue` | 某公历年 12 个流月（节气区间 + 干支十神） |
+| `bazi_lunar` | 公历↔农历互转 |
+
+出生信息统一用 `birth_*` 参数（与查询年 `year` 区分）。在线介绍页见 GitHub Pages（`docs/index.html`）。
 
 ---
 

@@ -24,6 +24,7 @@ dev = ["pytest>=7"]
 
 [project.scripts]
 bazi = "bazi.cli:main"
+bazi-mcp = "bazi.mcp_server:main"
 
 [project.urls]
 Homepage = "https://github.com/liyooh007/bazi-chart"

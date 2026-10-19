@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bazi-chart · 四柱八字排盘引擎（Python / 真太阳时 / MCP）</title>
+<meta name="description" content="纯标准库零依赖的四柱八字排盘引擎：自研 VSOP87D 历法（对照 JPL DE441 ≤1 分钟）、真太阳时跨日换柱、农历、格局用神、大运流年、MCP server。">
+<style>
+  :root{--bg:#0f1115;--card:#181b22;--fg:#e8eaed;--mut:#9aa0aa;--acc:#d4a24e;--line:#2a2e37;--good:#5fbf8f}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg)}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 20px 80px}
+  h1{font-size:30px;margin:0 0 6px} h1 span{color:var(--acc)}
+  h2{font-size:20px;margin:42px 0 12px;border-left:3px solid var(--acc);padding-left:10px}
+  .sub{color:var(--mut);margin:0 0 24px}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:14px 0}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  code{background:#22252d;padding:2px 6px;border-radius:5px;font-size:13px}
+  pre{background:#0b0d11;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;font-size:13px;line-height:1.6}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#20232b}
+  .yes{color:var(--good);font-weight:600} .no{color:#c77}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:2px 12px;margin:3px;font-size:13px;color:var(--mut)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .foot{color:var(--mut);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+  .badge{display:inline-block;background:#22252d;border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-size:12px;color:var(--mut);margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>bazi<span>-chart</span></h1>
+  <p class="sub">四柱八字排盘引擎 · 纯 Python 标准库 · 零依赖离线运行 · 支持 MCP（AI Agent）</p>
+  <div>
+    <span class="badge">Python ≥3.9</span><span class="badge">MIT</span>
+    <span class="badge">VSOP87D 历法</span><span class="badge">真太阳时</span><span class="badge">MCP stdio</span>
+  </div>
+  <p class="sub" style="margin-top:18px">
+    <a href="https://github.com/liyooh007/bazi-chart">GitHub 仓库 ↗</a> ·
+    <code>pip install bazi-chart</code>
+  </p>
+
+  <h2>它是什么</h2>
+  <div class="card">
+    一个只做<b>历法与排盘算法</b>的 Python 库/CLI。节气由太阳视黄经实时推算（1900–2050 对照 JPL DE441 偏差 ≤1 分钟），
+    农历据权威朔望月年表逐日往返零误差；支持出生地真太阳时换算与<b>跨日子时自动换日柱</b>，并输出格局用神、神煞、大运流年。
+    随包附带 <b>MCP server</b>，可直接挂到 Claude Desktop 等 AI 客户端。<br>
+    <small class="sub">本项目是历法/算法工程，命理内容为民俗文化研究，不做命运预测。</small>
+  </div>
+
+  <h2>与常见开源方案对比</h2>
+  <table>
+    <tr><th>能力</th><th>bazi-chart (本项目)</th><th>lunar-python / 多数 bazi 库</th><th>TS 系 bazi-mcp</th></tr>
+    <tr><td>语言 / 运行</td><td>Python，纯标准库</td><td>Python（lunar）/ TS</td><td>Node.js / TypeScript</td></tr>
+    <tr><td>历法实现</td><td class="yes">自研 VSOP87D，无查表依赖</td><td>独立算法 / 自带表</td><td class="no">多数依赖 tyme/lunar</td></tr>
+    <tr><td>真太阳时 + 跨日换柱</td><td class="yes">有（经度+均时差，自动换日柱）</td><td>部分支持</td><td>部分支持</td></tr>
+    <tr><td>完全离线</td><td class="yes">是，树莓派可跑</td><td>是</td><td>是</td></tr>
+    <tr><td>格局/用神/调候/神煞/大运</td><td class="yes">含穷通宝鉴、子平格局成败等</td><td class="no">多为基础干支</td><td>部分</td></tr>
+    <tr><td>MCP（AI Agent）</td><td class="yes">内置 stdio server</td><td class="no">无</td><td class="yes">有</td></tr>
+    <tr><td>结构化 JSON</td><td class="yes">to_dict() / MCP 输出</td><td>部分</td><td class="yes">有</td></tr>
+  </table>
+
+  <h2>快速开始</h2>
+<pre>pip install bazi-chart
+
+# 文本命书（真太阳时按出生地经度）
+bazi chart 1990-06-15 08:00 -g 男 --lon 117.0
+
+# JSON 结构化排盘
+bazi chart 1990-06-15 08:00 -g 男 --lon 117.0 --json --brief
+
+# 农历 → 公历；二十四节气
+bazi solar 1981 11 3
+bazi terms 2026
+
+# 自检（节气/农历/遁法/边界共 41 项）
+bazi verify</pre>
+
+  <h2>MCP：挂到 AI 助手</h2>
+  <div class="card">
+    启动命令 <code>bazi-mcp</code>（或 <code>python -m bazi.mcp_server</code>），stdio JSON-RPC，零依赖。
+    Claude Desktop 配置：
+<pre>{
+  "mcpServers": {
+    "bazi": { "command": "bazi-mcp" }
+  }
+}</pre>
+    暴露 4 个工具，<b>只返回确定性排盘事实，吉凶解读交给模型</b>：
+    <div style="margin-top:8px">
+      <span class="pill">bazi_chart 四柱+大运+格局</span>
+      <span class="pill">bazi_liunian 流年</span>
+      <span class="pill">bazi_liuyue 十二流月</span>
+      <span class="pill">bazi_lunar 农历互转</span>
+    </div>
+  </div>
+
+  <h2>作为库使用</h2>
+<pre>from bazi import BaziChart
+
+c = BaziChart(1990, 6, 15, 8, 0, gender="男", longitude=117.0)
+print(c.four_pillars.ganzhi)          # 四柱干支
+print(c.pattern.name, c.pattern.yongshen)   # 格局、用神
+print([d.name for d in c.dayun])      # 大运
+print(c.liunian(2026).relations)      # 某流年与原柱关系
+import json; print(json.dumps(c.to_dict(), ensure_ascii=False))</pre>
+
+  <h2>适用 / 不适用</h2>
+  <div class="grid">
+    <div class="card"><b>适合</b><br>· Python 后端 / 内网 / 树莓派离线排盘<br>· 给 AI Agent 提供准确八字数据<br>· 需要真太阳时与海外跨日场景<br>· 二次开发（JSON + 分层 API）</div>
+    <div class="card"><b>不包含</b><br>· 紫微斗数 / 奇门 / 六爻（专注四柱）<br>· 在线算命网站 / SaaS<br>· 命运预测结论（只给事实与传统规则标签）</div>
+  </div>
+
+  <p class="foot">
+    bazi-chart · MIT License · 历法部分可独立验证（<code>bazi verify</code> 41 项）。<br>
+    命理为传统民俗文化，相关结论无科学预测效力，仅供文化研究参考。
+  </p>
+</div>
+</body>
+</html>
