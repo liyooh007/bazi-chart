@@ -157,13 +157,13 @@ def chart_rating(chart) -> dict:
     else:
         d["调候寒暖"] = 7.0 if (not p.tiaohou or power.percent.get(p.tiaohou, 0) >= 8) else 3.0
     d["神煞吉凶"] = round(max(0.0, min(10.0, 5 + chart.shensha.score * 0.8)), 1)
-    yun = (_avg(dys, slice(0, 3)) + _avg(dys, slice(3, 6)) + _avg(dys, slice(7, 10))) / 3
+    yun = (_avg(dys, slice(0, 3)) + _avg(dys, slice(3, 6)) + _avg(dys, slice(6, 10))) / 3
     d["行运辅成"] = round(max(0.0, min(15.0, 7.5 + yun * 2.6)), 1)
     total = round(sum(d.values()), 1)
     grade, comment = next((g[1], g[2]) for g in GRADES if total >= g[0])
     return {"总分": total, "分项": d, "评级": grade, "评级说明": comment,
             "大运": {"早年": _avg(dys, slice(0, 3)), "中年": _avg(dys, slice(3, 6)),
-                     "晚年": _avg(dys, slice(7, 10))}}
+                     "晚年": _avg(dys, slice(6, 10))}}
 
 
 def build_context(chart) -> dict:

@@ -461,14 +461,10 @@ def _partner_advice(fp, pattern, power) -> str:
 # --------------------------------------------------------------------------- #
 def yearly_forecast(chart, year: int) -> dict:
     """某年运势要点（结合大运与命局）。"""
-    from .fortune import liunian_of
+    from .fortune import liunian_of, dayun_at
     p = chart.pattern
     lines = []
-    dy = None
-    for d in chart.dayun:
-        if d.start_year <= year <= d.end_year:
-            dy = d
-            break
+    dy = dayun_at(chart.dayun, year, chart.tz_hours)
     ln = liunian_of(chart.four_pillars, year, p, dy)
     lines.append(f"流年 {ln.name}（{ln.year}，{ln.age:.0f} 岁），年干十神为{ln.shishen}，"
                  f"年支本气为{ln.zhi_shishen}。")

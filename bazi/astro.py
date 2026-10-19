@@ -70,11 +70,9 @@ def datetime_from_jd(jd: float) -> datetime:
     day_int = int(math.floor(day))
     frac = day - day_int
     total = int(round(frac * 86400.0))
-    if total >= 86400:                    # 秒进位
-        total -= 86400
-        day_int += 1
-    base = datetime(year, month, day_int)
-    return base + timedelta(seconds=total)
+    # ponytail: 从当月1号起算，月末秒进位交给 datetime/timedelta 处理，避免 day_int+1 越界
+    base = datetime(year, month, 1)
+    return base + timedelta(days=day_int - 1, seconds=total)
 
 
 def jdn_from_date(year: int, month: int, day: int) -> int:

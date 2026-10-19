@@ -128,10 +128,9 @@ def solar_to_lunar(y: int, m: int, d: int) -> LunarDate:
         nxt = months[i + 1][3] if i + 1 < len(months) else start + length
         if start <= jdn < nxt:
             cur = (num, is_leap, length, jdn - start + 1)
-            break
-    if cur is None:                       # 落在年末之后的极少数边界
-        num, is_leap, length, start = months[-1]
-        cur = (num, is_leap, length, jdn - start + 1)
+    if cur is None:
+        # 落在年表最后一年之后（2100 年腊月之后）
+        raise ValueError("日期晚于农历年表上界（2100 年腊月）")
     num, is_leap, length, day = cur
     return LunarDate(ly, num, day, is_leap, length, lunar_year_days(ly))
 

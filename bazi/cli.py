@@ -45,6 +45,11 @@ def _parse_dt(date_str: str, time_str: str | None) -> tuple[int, int, int, int, 
         mm = int(m2.group(2) or 0)
     if not (0 <= hh <= 23 and 0 <= mm <= 59):
         raise SystemExit("时间应在 00:00–23:59 之间")
+    from datetime import datetime
+    try:
+        datetime(y, mo, d, hh, mm)
+    except ValueError as e:
+        raise SystemExit(f"日期不合法：{e}") from None
     return y, mo, d, hh, mm
 
 
@@ -189,7 +194,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except (ValueError, OverflowError) as e:
+        print(f"错误：{e}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":      # pragma: no cover

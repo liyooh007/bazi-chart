@@ -252,6 +252,18 @@ def cast_pillars(dt: datetime, gender: str = "男", *,
     :param tz_hours: 出生地时区相对 UTC 的偏移（小时）
     :param day_rollover: ``"zi"``（默认，23:00 换日）或 ``"midnight"``（00:00 换日）
     """
+    # 统一入参校验：拼写错误宁可报错，也不静默排出另一张盘
+    if gender not in ("男", "女"):
+        raise ValueError(f"gender 只支持 '男'/'女'，收到 {gender!r}")
+    if day_rollover not in ("zi", "midnight"):
+        raise ValueError(f"day_rollover 只支持 'zi'/'midnight'，收到 {day_rollover!r}")
+    if not -180.0 <= (longitude if longitude is not None else 0.0) <= 180.0:
+        raise ValueError(f"longitude 必须在 [-180, 180]，收到 {longitude!r}")
+    if not -12.0 <= tz_hours <= 14.0:
+        raise ValueError(f"tz_hours 必须在 [-12, 14]，收到 {tz_hours!r}")
+    if dt.tzinfo is not None:
+        raise ValueError("dt 请传 naive datetime（本地标准时），时区用 tz_hours 表达")
+
     raw = dt
     applied = False
     if longitude is not None:
@@ -274,7 +286,7 @@ def cast_pillars(dt: datetime, gender: str = "男", *,
     try:
         from .lunar import solar_to_lunar
         lunar_date = solar_to_lunar(dt.year, dt.month, dt.day)
-    except Exception:                      # 超出农历年表范围时忽略
+    except ValueError:             # 超出农历年表范围时忽略，不掩盖别的 bug
         lunar_date = None
 
     return FourPillars(ypillar, mpillar, dpillar, hpillar, dt, raw, byear,

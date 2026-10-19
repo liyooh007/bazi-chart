@@ -20,7 +20,8 @@ from .constants import (
     TIANGAN, DIZHI, WUXING, GAN_WUXING, ZHI_WUXING, SHISHEN,
     shishen, sheng, ke, nayin, constellation,
 )
-from .fortune import DaYun, LiuNian, dayun_list, start_age, liunian_of, liuyue_of
+from .fortune import (DaYun, LiuNian, dayun_at, dayun_list, start_age,
+                      liunian_of, liuyue_of)
 from .pillars import (
     FourPillars, WuXingPower, cast_pillars, day_master_strength,
     wuxing_balance, shishen_distribution as _ss_dist,
@@ -106,7 +107,7 @@ class BaziChart:
     # 流年
     # ------------------------------------------------------------------ #
     def liunian(self, year: int) -> LiuNian:
-        dy = next((d for d in self.dayun if d.start_year <= year <= d.end_year), None)
+        dy = dayun_at(self.dayun, year, self.tz_hours)
         return liunian_of(self.four_pillars, year, self.pattern, dy)
 
     def liunian_table(self, start: int, end: int) -> list[dict]:

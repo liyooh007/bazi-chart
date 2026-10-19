@@ -472,6 +472,64 @@ def test_range_guards(rep: Report) -> None:
         ok = "1899" in str(e) or "年表" in str(e)
     rep.check(ok, "范围保护：超出农历年表下界的日期明确报错")
 
+    # 农历上界（2100 年腊月之后；2101-01-01 仍属农历 2100 年，不越界）
+    ok = False
+    try:
+        solar_to_lunar(2101, 3, 1)
+    except ValueError:
+        ok = True
+    rep.check(ok, "范围保护：超出农历年表上界的日期明确报错")
+
+    # P0：入参校验——拼错的 gender/rollover/经度/时区必须报错，不静默排出另一张盘
+    from datetime import datetime
+    from ..pillars import cast_pillars
+    base = datetime(1990, 5, 12, 14, 30)
+    bad = ({"gender": "M"}, {"day_rollover": "ZI"}, {"longitude": 200.0},
+           {"tz_hours": 20.0})
+    guard_ok = True
+    for kw in bad:
+        try:
+            cast_pillars(base, **kw)
+            guard_ok = False
+        except ValueError:
+            pass
+        except Exception:
+            guard_ok = False
+    rep.check(guard_ok, "范围保护：非法 gender/换日规则/经度/时区统一 ValueError")
+
+    # P0：datetime_from_jd 月末秒进位不崩（1/3/5/7/8/10/12 月 31 号附近往返）
+    from ..astro import jd_from_datetime, datetime_from_jd
+    jd_ok = all(datetime_from_jd(jd_from_datetime(datetime(y, m, 31)) + 0.99999 / 86400)
+                for y in (1990, 2000, 2024) for m in (1, 3, 12))
+    rep.check(jd_ok, "月末秒进位：JD→datetime 在 31 号附近不构造非法日期")
+
+    # P0：_tou_groups 只取年/月/时三干（日柱是日主自己，不算透出）
+    from .. import BaziChart
+    c = BaziChart(1990, 5, 12, 14, 30, gender="男", longitude=116.4)
+    from ..ziping import _tou_groups
+    from ..constants import SHISHEN_GROUP, shishen
+    fp = c.four_pillars
+    expect = {SHISHEN_GROUP[shishen(fp.day.gan, p.gan)]
+              for p in (fp.year, fp.month, fp.hour)}
+    rep.check(_tou_groups(fp) == expect,
+              "子平：透干十神只取年/月/时三干，排除日主比肩")
+
+    # P0：大运匹配是半开区间——交运年只命中一步大运；交运前的立春不归该运
+    from ..fortune import dayun_at
+    from ..solar_terms import all_terms
+    dys = c.dayun
+    boundary_bad = False
+    if len(dys) >= 2:
+        lc = all_terms(dys[1].start_year, c.tz_hours)["立春"]
+        hit = [d for d in dys if d.start_dt <= lc
+               and (d.end_dt is None or lc < d.end_dt)]
+        boundary_bad = len(hit) != 1
+    # 该盘第 2 运 2008-08 交运：2008 立春在交运前→仍属第 1 运；2009 立春→第 2 运
+    rep.check(not boundary_bad
+              and dayun_at(dys, 2008, c.tz_hours) is dys[0]
+              and dayun_at(dys, 2009, c.tz_hours) is dys[1],
+              "大运：交运边界年只命中一步（半开区间，立春时刻比较）")
+
 
 # --------------------------------------------------------------------------- #
 # 入口

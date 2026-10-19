@@ -72,6 +72,7 @@ class DaYun:
     start_year: int
     end_year: int
     start_dt: datetime
+    end_dt: datetime | None = None    # 下一步交运时刻（半开区间上界），末运为 None
     shishen: str = ""          # 大运天干十神
     zhi_shishen: str = ""      # 大运地支本气十神
     changsheng: str = ""       # 日干在大运支的十二长生
@@ -121,7 +122,7 @@ def dayun_list(fp, pattern=None, power=None, steps: int = 10,
         s_dt = jiao + timedelta(days=(k - 1) * 10 * 365.2422)
         e_dt = jiao + timedelta(days=k * 10 * 365.2422)
         dz = DaYun(k, gan, zhi, s_age, e_age,
-                   s_dt.year, e_dt.year, s_dt,
+                   s_dt.year, e_dt.year, s_dt, e_dt,
                    shishen(dg, gan), shishen(dg, _zhi_main_gan(zhi)),
                    changsheng(dg, zhi),
                    f"{GAN_WUXING[TIANGAN.index(gan)]}{ZHI_WUXING[DIZHI.index(zhi)]}")
@@ -129,6 +130,19 @@ def dayun_list(fp, pattern=None, power=None, steps: int = 10,
             dz.score = _dayun_score(gan, zhi, fp, yong, xishen, jishen, qw)
         out.append(dz)
     return out
+
+
+def dayun_at(dayuns: list[DaYun], year: int, tz_hours: float = 8.0) -> DaYun | None:
+    """流年（以该年立春为界）落在哪一步大运：半开区间 [start_dt, end_dt)。
+
+    边界年（交运年）不再同时命中两步；用立春时刻而非年初一/1月1日。
+    """
+    from .solar_terms import all_terms
+    lichun = all_terms(year, tz_hours)["立春"]
+    for d in dayuns:
+        if d.start_dt <= lichun and (d.end_dt is None or lichun < d.end_dt):
+            return d
+    return None
 
 
 def _zhi_main_gan(zhi: str) -> str:

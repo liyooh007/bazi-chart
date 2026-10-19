@@ -64,7 +64,8 @@ def _tou_groups(fp) -> set[str]:
     """天干透出（年月日时）的十神组——透干才算明见、有力。"""
     from .constants import SHISHEN_GROUP, shishen
     dg = fp.day.gan
-    return {SHISHEN_GROUP[shishen(dg, p.gan)] for p in fp.pillars}
+    # 透干只取年/月/时三干；日柱是日主自己（shishen=比肩），计入会让比劫永远"透出"
+    return {SHISHEN_GROUP[shishen(dg, p.gan)] for p in fp.pillars[:3]}
 
 
 def geju_cheng_bai(chart) -> dict:
@@ -169,7 +170,7 @@ def guan_sha_hun_za(chart) -> dict:
     if has_qi and any(s in tou for s in ("食神", "伤官")):
         rescue.append("食伤透干制杀")
     # 印化：偏印/正印透干化杀
-    if has_qi and "偏印" in tou:
+    if has_qi and any(s in tou for s in ("偏印", "正印")):
         rescue.append("印星化杀")
 
     if rescue:
