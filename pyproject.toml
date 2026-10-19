@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bazi-chart"
-version = "1.0.0"
+dynamic = ["version"]
 description = "四柱八字 CLI 排盘引擎：真太阳时跨日修正、VSOP87D/JPL DE441 精度节气、农历转换、格局用神、神煞大运（纯标准库离线）"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
 [project.scripts]
 bazi = "bazi.cli:main"
 
@@ -28,3 +31,15 @@ Repository = "https://github.com/liyooh007/bazi-chart"
 
 [tool.setuptools.packages.find]
 include = ["bazi*"]
+exclude = ["bazi.tests*", "tests*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "bazi.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["bazi/tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py39"
