@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bazi-chart"
+version = "1.0.0"
+description = "四柱八字 CLI 排盘引擎：真太阳时跨日修正、VSOP87D/JPL DE441 精度节气、农历转换、格局用神、神煞大运（纯标准库离线）"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "liyooh007" }]
+keywords = ["bazi", "four-pillars", "chinese-calendar", "true-solar-time", "astronomy", "lunar-calendar", "jpl-ephemeris", "cli"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+dependencies = []
+
+[project.scripts]
+bazi = "bazi.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/liyooh007/bazi-chart"
+Repository = "https://github.com/liyooh007/bazi-chart"
+
+[tool.setuptools.packages.find]
+include = ["bazi*"]
