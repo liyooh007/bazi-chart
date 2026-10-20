@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+# ponytail: 导入必须起别名，否则下方同名 pytest wrapper 会覆盖自检函数，导致 _run 调到自己
 from . import (
-    Report, test_boundaries, test_cases, test_consistency, test_ganzhi,
-    test_lunar, test_range_guards, test_solar_terms,
+    Report,
+    test_boundaries as _t_boundaries,
+    test_cases as _t_cases,
+    test_consistency as _t_consistency,
+    test_ganzhi as _t_ganzhi,
+    test_lunar as _t_lunar,
+    test_range_guards as _t_range_guards,
+    test_solar_terms as _t_solar_terms,
 )
 
 
@@ -15,28 +22,28 @@ def _run(fn) -> None:
 
 
 def test_solar_term_accuracy() -> None:
-    _run(test_solar_terms)
+    _run(_t_solar_terms)
 
 
 def test_lunar_calendar() -> None:
-    _run(test_lunar)
+    _run(_t_lunar)
 
 
 def test_ganzhi_rules() -> None:
-    _run(test_ganzhi)
+    _run(_t_ganzhi)
 
 
 def test_published_cases() -> None:
-    _run(test_cases)
+    _run(_t_cases)
 
 
 def test_boundaries() -> None:
-    _run(test_boundaries)
+    _run(_t_boundaries)
 
 
 def test_chart_consistency() -> None:
-    _run(test_consistency)
+    _run(_t_consistency)
 
 
 def test_range_guard() -> None:
-    _run(test_range_guards)
+    _run(_t_range_guards)
