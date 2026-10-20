@@ -515,6 +515,34 @@ def test_range_guards(rep: Report) -> None:
               for p in (fp.year, fp.month, fp.hour)}
     rep.check(_tou_groups(fp) == expect,
               "子平：透干十神只取年/月/时三干，排除日主比肩")
+    # 反巧合：选一个日干≠时干的命盘，旧实现 pillars[:3] 会漏时干、误纳日主比劫
+    c2 = BaziChart(1990, 1, 1, 4, 0, gender="男")      # 丙寅日 / 庚寅时
+    fp2 = c2.four_pillars
+    assert fp2.day.gan != fp2.hour.gan
+    expect2 = {SHISHEN_GROUP[shishen(fp2.day.gan, p.gan)]
+               for p in (fp2.year, fp2.month, fp2.hour)}
+    got2 = _tou_groups(fp2)
+    rep.check(got2 == expect2 and "财星" in got2,
+              "子平：时干≠日干时透干集合仍取年/月/时（回归：旧 [:3] 漏时干）",
+              f"got={got2} expect={expect2}")
+
+    # P1：MCP 流月区间严格单调衔接，第12月（丑月）起于次年小寒
+    from ..mcp_server import tool_liuyue
+    ly_bad = ""
+    for yr in (2024, 2049):
+        rows = tool_liuyue(dict(birth_year=2000, birth_month=1, birth_day=1,
+                                birth_hour=12, gender="男", year=yr))
+        if len(rows) != 12:
+            ly_bad = f"{yr} 月数={len(rows)}"; break
+        if any(rows[i]["止"] <= rows[i]["起"] for i in range(12)):
+            ly_bad = f"{yr} 区间倒挂"; break
+        if any(rows[i]["止"] != rows[i + 1]["起"] for i in range(11)):
+            ly_bad = f"{yr} 区间不衔接"; break
+        if not (rows[-1]["起"].startswith(str(yr + 1))
+                and rows[-1]["止"].startswith(str(yr + 1))):
+            ly_bad = f"{yr} 丑月未在次年: {rows[-1]['起']}"
+    rep.check(not ly_bad, "MCP流月：12月区间单调衔接，丑月起于次年小寒", ly_bad)
+
 
     # P0：大运匹配是半开区间——交运年只命中一步大运；交运前的立春不归该运
     from ..fortune import dayun_at

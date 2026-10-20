@@ -65,7 +65,9 @@ def _tou_groups(fp) -> set[str]:
     from .constants import SHISHEN_GROUP, shishen
     dg = fp.day.gan
     # 透干只取年/月/时三干；日柱是日主自己（shishen=比肩），计入会让比劫永远"透出"
-    return {SHISHEN_GROUP[shishen(dg, p.gan)] for p in fp.pillars[:3]}
+    # 注意 pillars 顺序是 (年,月,日,时)，不能用 [:3]（那会误取日、漏时）
+    return {SHISHEN_GROUP[shishen(dg, p.gan)]
+            for p in (fp.year, fp.month, fp.hour)}
 
 
 def geju_cheng_bai(chart) -> dict:
