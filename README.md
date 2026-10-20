@@ -242,7 +242,17 @@ python -m bazi.mcp_server   # 源码目录
 uvx --from bazi-chart bazi-mcp
 ```
 
-Claude Desktop 配置（uvx 方式）：
+已收录于[官方 MCP Registry](https://modelcontextprotocol.io/registry)（ID `io.github.liyooh007/bazi-chart`）。所有客户端本质都是启动同一个 stdio 命令：
+
+- 命令 `uvx`，参数 `--from bazi-chart bazi-mcp`（需先装 [uv](https://github.com/astral-sh/uv)）
+
+**Claude Code**
+
+```bash
+claude mcp add bazi -- uvx --from bazi-chart bazi-mcp
+```
+
+**Cursor / VS Code / Claude Desktop**（`mcp.json`）：
 
 ```json
 {
@@ -252,15 +262,24 @@ Claude Desktop 配置（uvx 方式）：
 }
 ```
 
-已装 pip 的传统方式同样可用：
+**Codex CLI**（`~/.codex/config.toml`）：
 
-```json
-{
-  "mcpServers": {
-    "bazi": { "command": "bazi-mcp" }
-  }
-}
+```toml
+[mcp_servers.bazi]
+command = "uvx"
+args = ["--from", "bazi-chart", "bazi-mcp"]
 ```
+
+**Hermes Agent**
+
+```bash
+hermes mcp add bazi --command uvx --args --from bazi-chart bazi-mcp
+```
+
+> 无 uv / 网络受限时，先 `pip install bazi-chart`，再把命令换成 `bazi-mcp` 的绝对路径（如 `/home/you/.local/bin/bazi-mcp`）、args 留空即可。
+
+连上后直接用自然语言提问，例如「公历 2026-10-20 12 时，男，山东济南，排八字」，客户端会自动调用对应工具。
+
 
 | 工具 | 作用 |
 |---|---|

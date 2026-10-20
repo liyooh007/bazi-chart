@@ -120,7 +120,15 @@ only** — interpretations are left to the host model.
 uvx --from bazi-chart bazi-mcp
 ```
 
-Claude Desktop config:
+Published in the [official MCP Registry](https://modelcontextprotocol.io/registry) (ID `io.github.liyooh007/bazi-chart`). Every client launches the same stdio command: `uvx` with args `--from bazi-chart bazi-mcp` ([uv](https://github.com/astral-sh/uv) required).
+
+**Claude Code**
+
+```bash
+claude mcp add bazi -- uvx --from bazi-chart bazi-mcp
+```
+
+**Cursor / VS Code / Claude Desktop** (`mcp.json`):
 
 ```json
 {
@@ -129,6 +137,24 @@ Claude Desktop config:
   }
 }
 ```
+
+**Codex CLI** (`~/.codex/config.toml`):
+
+```toml
+[mcp_servers.bazi]
+command = "uvx"
+args = ["--from", "bazi-chart", "bazi-mcp"]
+```
+
+**Hermes Agent**
+
+```bash
+hermes mcp add bazi --command uvx --args --from bazi-chart bazi-mcp
+```
+
+> Without uv / on restricted networks: `pip install bazi-chart`, then set the command to the absolute path of `bazi-mcp` (e.g. `/home/you/.local/bin/bazi-mcp`) with empty args.
+
+Once connected, just ask in natural language, e.g. "Cast a BaZi chart: 2026-10-20 12:00, male, born in Jinan, China" — the client picks the right tool automatically.
 
 | Tool | Purpose |
 |---|---|
