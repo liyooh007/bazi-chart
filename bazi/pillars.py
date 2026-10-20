@@ -27,8 +27,6 @@ __all__ = [
     "build_four_pillars", "shishen_distribution", "wuxing_balance",
 ]
 
-_ZHI_BY_INDEX = DIZHI
-_GAN_BY_INDEX = TIANGAN
 
 
 # --------------------------------------------------------------------------- #
@@ -174,7 +172,6 @@ class FourPillars:
 
     def relations(self) -> list[str]:
         """四柱之间的刑冲合害关系描述。"""
-        from .constants import ZHI_HE, ZHI_CHONG, ZHI_HAI, DIZHI
         out: list[str] = []
         labels = ("年", "月", "日", "时")
         for i in range(4):

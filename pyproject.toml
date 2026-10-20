@@ -47,7 +47,7 @@ Changelog = "https://github.com/liyooh007/bazi-chart/releases"
 
 [tool.setuptools.packages.find]
 include = ["bazi*"]
-exclude = ["bazi.tests*", "tests*"]
+# ponytail: tests 一并打包——`bazi verify` 是文档化自检命令，pip 安装后必须可用
 
 [tool.setuptools.dynamic]
 version = { attr = "bazi.__version__" }

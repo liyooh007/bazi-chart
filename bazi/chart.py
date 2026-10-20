@@ -338,7 +338,8 @@ class BaziChart:
                         for i, line in enumerate(txt.split("\n")):
                             L.append(f"  {k:<8}{line}" if i == 0 else f"          {line}")
         L.append("")
-        L.append("（本命书由 bazi v1.0 生成：节气以太阳视黄经实时推算，"
+        from . import __version__ as _v
+        L.append(f"（本命书由 bazi v{_v} 生成：节气以太阳视黄经实时推算，"
                  "1900–2050 年与 JPL DE441 偏差 ≤1 分钟；"
                  "农历据权威朔望月年表，逐日往返零误差）")
         return "\n".join(L)

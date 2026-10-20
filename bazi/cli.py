@@ -53,12 +53,27 @@ def _parse_dt(date_str: str, time_str: str | None) -> tuple[int, int, int, int, 
     return y, mo, d, hh, mm
 
 
+def _resolve_lon(args):
+    """--lon 优先；否则按 --city 查内置城市经度。查不到报错。"""
+    if args.lon is not None:
+        return args.lon
+    city = getattr(args, "city", None)
+    if city:
+        from .data.city_longitude import lookup_longitude
+        lon = lookup_longitude(city)
+        if lon is None:
+            raise SystemExit(
+                f"未收录城市「{city}」，请改用 --lon 手动给经度（东经为正、西经为负）")
+        return lon
+    return None
+
+
 def cmd_poem(args) -> int:
     """生成切合该八字的命理诗（七言八句，含逐句注解与命局评分）。"""
     from .chart import BaziChart
     y, mo, d, hh, mm = _parse_dt(args.date, args.time)
     chart = BaziChart(y, mo, d, hh, mm, gender=args.gender,
-                      longitude=args.lon, tz_hours=args.tz,
+                      longitude=_resolve_lon(args), tz_hours=args.tz,
                       name=args.name, day_rollover=args.rollover)
     if args.json:
         import json as _json
@@ -86,7 +101,7 @@ def cmd_chart(args) -> int:
     from .chart import BaziChart
     y, mo, d, hh, mm = _parse_dt(args.date, args.time)
     chart = BaziChart(y, mo, d, hh, mm, gender=args.gender,
-                      longitude=args.lon, tz_hours=args.tz,
+                      longitude=_resolve_lon(args), tz_hours=args.tz,
                       name=args.name, day_rollover=args.rollover)
     years = (args.years[0], args.years[1]) if args.years else None
     sections = tuple(args.sections) if args.sections else None
@@ -144,7 +159,9 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("time", nargs="?", help="出生时间 HH:MM（可省略）")
     c.add_argument("-g", "--gender", choices=("男", "女"), default="男")
     c.add_argument("--lon", type=float, default=None,
-                   help="出生地经度（东经为正），给出则换算真太阳时")
+                   help="出生地经度（东经为正、西经为负），给出则换算真太阳时")
+    c.add_argument("--city", default=None,
+                   help="出生地城市短名（如 济南、大理），内置 356 城经度；--lon 优先于 --city")
     c.add_argument("--tz", type=float, default=CST_OFFSET, help="时区偏移（小时），默认 8")
     c.add_argument("--name", default="", help="姓名（仅用于显示）")
     c.add_argument("--rollover", choices=("zi", "midnight"), default="zi",
@@ -181,7 +198,8 @@ def build_parser() -> argparse.ArgumentParser:
     pm.add_argument("date", help="公历生日 YYYY-MM-DD")
     pm.add_argument("time", nargs="?", help="出生时间 HH:MM")
     pm.add_argument("-g", "--gender", choices=("男", "女"), default="男")
-    pm.add_argument("--lon", type=float, default=None, help="出生地经度（东经为正）")
+    pm.add_argument("--lon", type=float, default=None, help="出生地经度（东经为正、西经为负）")
+    pm.add_argument("--city", default=None, help="出生地城市短名（如 济南、大理）；--lon 优先")
     pm.add_argument("--tz", type=float, default=CST_OFFSET)
     pm.add_argument("--name", default="")
     pm.add_argument("--rollover", choices=("zi", "midnight"), default="zi")

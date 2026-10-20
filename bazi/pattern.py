@@ -159,7 +159,7 @@ def _group_power(fp, power, group: str) -> float:
     dw = fp.day.gan_wuxing
     table = {"比劫": dw, "食伤": sheng(dw), "财星": ke(dw),
              "官杀": ke_wo(dw), "印星": sheng_wo(dw)}
-    return sum(power.percent.get(wx, 0.0) for wx in table[group].split(","))
+    return power.percent.get(table[group], 0.0)
 
 
 def _set_yongshen(p: Pattern, yong: str, xi: list[str], ji: list[str], fp) -> None:

@@ -53,6 +53,7 @@ __all__ = [
     "destiny_poem", "chart_rating", "PoemResult", "PoemLine", "verify_library",
     "TIANGAN", "DIZHI", "WUXING", "SOLAR_TERMS", "ZANGGAN", "NAYIN_30",
     "ganzhi", "shishen", "nayin", "changsheng", "xunkong",
+    "lookup_longitude", "CITY_LONGITUDE",
 ]
 
 from .constants import (
@@ -60,6 +61,7 @@ from .constants import (
     ganzhi, shishen, nayin, changsheng, xunkong,
 )
 from .astro import terms_of_year, solar_term_datetime
+from .data.city_longitude import CITY_LONGITUDE, lookup_longitude
 from .lunar import LunarDate, solar_to_lunar, lunar_to_solar
 from .pillars import (
     Pillar, FourPillars, cast_pillars, wuxing_balance as wu_xing_balance,

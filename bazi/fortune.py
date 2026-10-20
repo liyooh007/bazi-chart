@@ -226,8 +226,8 @@ def liunian_of(fp, year: int, pattern=None, dayun: DaYun | None = None) -> LiuNi
         ln.dayun = dayun.name
         if dayun.zhi == zhi:
             ln.tags.append("岁运并临（大运与流年同支）")
-        if set(dayun.name) == set(ln.name):
-            ln.tags.append("岁运伏吟")
+        if dayun.name == ln.name:
+            ln.tags.append("岁运伏吟（大运与流年干支完全相同）")
     if pattern is not None:
         wx = GAN_WUXING[TIANGAN.index(gan)]
         if wx == pattern.yongshen:

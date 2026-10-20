@@ -37,7 +37,6 @@ GAN_YANG = tuple(i % 2 == 0 for i in range(10))
 #: 地支阴阳（True=阳）
 ZHI_YANG = tuple(i % 2 == 0 for i in range(12))
 
-GAN_ANIMAL = "鼠牛虎兔龙蛇马羊猴鸡狗猪"        # 生肖（按地支）
 ZHI_HOUR_RANGE = (
     "23:00-00:59", "01:00-02:59", "03:00-04:59", "05:00-06:59",
     "07:00-08:59", "09:00-10:59", "11:00-12:59", "13:00-14:59",
@@ -67,8 +66,6 @@ ZHONG_TERMS = ("雨水", "春分", "谷雨", "小满", "夏至", "大暑",
 
 #: 月建：节 → 月支索引（立春→寅(2) … 大雪→子(0)、小寒→丑(1)）
 JIE_TO_MONTH_ZHI = {t: (2 + i) % 12 for i, t in enumerate(JIE_TERMS)}
-#: 月支序（寅=0 … 丑=11），用于五虎遁
-ZHI_MONTH_ORDER = {2 + i if 2 + i < 12 else (2 + i) % 12: i for i in range(12)}
 
 # --------------------------------------------------------------------------- #
 # 地支藏干（人元司事）
@@ -323,14 +320,6 @@ def shishen(day_gan: str, other_gan: str) -> str:
     if sheng_wo(dw) == ow:              # 生我
         return "偏印" if same_polarity else "正印"
     raise ValueError(f"无法归类 {day_gan} 与 {other_gan}")
-
-
-def shishen_of_wuxing(day_gan: str, wx: str) -> str:
-    """给定五行（非天干）时的十神归类别名，取同阴阳的一半。"""
-    dw = gan_wuxing(day_gan)
-    table = {dw: "比肩", sheng(dw): "食神", ke(dw): "偏财",
-             ke_wo(dw): "七杀", sheng_wo(dw): "偏印"}
-    return table[wx]
 
 
 def changsheng(gan: str, zhi: str) -> str:

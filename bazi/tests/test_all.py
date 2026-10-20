@@ -47,3 +47,21 @@ def test_chart_consistency() -> None:
 
 def test_range_guard() -> None:
     _run(_t_range_guards)
+
+
+def test_city_longitude_lookup() -> None:
+    """城市短名/后缀剥离/未知城市的经度解析。"""
+    from ..data.city_longitude import CITY_LONGITUDE, lookup_longitude
+    assert len(CITY_LONGITUDE) >= 300
+    assert lookup_longitude("济南") == 116.98
+    assert lookup_longitude("济南市") == lookup_longitude("济南")
+    assert lookup_longitude("北京") == 116.4
+    assert lookup_longitude("大理州") == lookup_longitude("大理")
+    # 民族自治州全称：单民族 + 多民族连缀都要剥到地名（回归：旧后缀表残留“大理白族”）
+    assert lookup_longitude("大理白族自治州") == lookup_longitude("大理")
+    assert lookup_longitude("西双版纳傣族自治州") == lookup_longitude("西双版纳")
+    assert lookup_longitude("红河哈尼族彝族自治州") == lookup_longitude("红河")
+    assert lookup_longitude("香港特别行政区") == CITY_LONGITUDE["香港"]
+    assert lookup_longitude("花果山") is None
+    assert lookup_longitude("") is None
+    assert lookup_longitude(None) is None

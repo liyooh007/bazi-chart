@@ -596,7 +596,8 @@ def run_all(verbose: bool = True) -> int:
     rep = Report(verbose)
     if verbose:
         print("=" * 74)
-        print("  八字命理引擎 v1.0 — 内置验证套件")
+        from .. import __version__ as _v
+        print(f"  八字命理引擎 v{_v} — 内置验证套件")
         print("=" * 74)
     for title, fn in SECTIONS:
         if verbose:

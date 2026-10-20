@@ -22,7 +22,7 @@ from .constants import DIZHI, TIANGAN, SHENGXIAO
 from .data.lunar_table import LUNAR_YEARS, FIRST_YEAR, JDN_OFFSET
 
 __all__ = ["LunarDate", "lunar_year_months", "lunar_year_days",
-           "solar_to_lunar", "lunar_to_solar", "LUNAR_MIN", "LUNAR_MAX"]
+           "solar_to_lunar", "lunar_to_solar"]
 
 #: 各农历年正月初一的儒略日数（用于二分查找）
 _ANCHORS = tuple(a + JDN_OFFSET for a, _, _, _ in LUNAR_YEARS)
@@ -107,11 +107,6 @@ def _year_index_from_jdn(jdn: int) -> int:
     if i >= len(_ANCHORS):
         i = len(_ANCHORS) - 1
     return i
-
-
-#: 支持的公历范围
-LUNAR_MIN = (FIRST_YEAR, 2, 10)
-LUNAR_MAX = (FIRST_YEAR + len(LUNAR_YEARS) - 1, 12, 31)
 
 
 def solar_to_lunar(y: int, m: int, d: int) -> LunarDate:

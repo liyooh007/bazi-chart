@@ -151,6 +151,7 @@ bazi chart <YYYY-MM-DD> <HH:MM> -g <男|女> [--lon 经度] [--tz 时区] [--yea
 | `<YYYY-MM-DD> <HH:MM>` | 公历时间，24 小时制 |
 | `-g`, `--gender` | 性别：`男` / `女`，用于大运顺逆 |
 | `--lon` | 出生地经度；东经为正，西经为负，用于真太阳时校正 |
+| `--city` | 出生地城市短名（如 济南、大理），内置 356 个国内地级单位经度自动换算；与 `--lon` 同给时 `--lon` 优先。海外请用 `--lon` |
 | `--tz` | 输入时钟相对 UTC 的时区偏移，默认 `8`；海外当地时间需显式指定 |
 | `--years START END` | 输出指定区间的流年 |
 | `--json` | 输出结构化 JSON |
@@ -288,7 +289,7 @@ hermes mcp add bazi --command uvx --args --from bazi-chart bazi-mcp
 | `bazi_liuyue` | 某公历年 12 个流月（节气区间 + 干支十神） |
 | `bazi_lunar` | 公历↔农历互转 |
 
-出生信息统一用 `birth_*` 参数（与查询年 `year` 区分）。在线介绍页见 GitHub Pages（`docs/index.html`）。
+出生信息统一用 `birth_*` 参数（与查询年 `year` 区分）。出生地支持两种：直接给 `longitude`（经度，海外用，西经为负），或给 `birth_city`（国内城市短名，如"济南""大理"，自动取经度）；二者同给时 `longitude` 优先。在线 Demo 见 GitHub Pages（`docs/demo.html`），城市名自动补全，内置 356 城、全程离线。
 
 ---
 
