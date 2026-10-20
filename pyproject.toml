@@ -13,9 +13,20 @@ authors = [{ name = "liyooh007" }]
 keywords = ["bazi", "four-pillars", "chinese-calendar", "true-solar-time", "astronomy", "lunar-calendar", "jpl-ephemeris", "cli"]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Religion",
+    "Topic :: Utilities",
+    "Natural Language :: Chinese (Simplified)",
 ]
 dependencies = []
 
@@ -29,6 +40,10 @@ bazi-mcp = "bazi.mcp_server:main"
 [project.urls]
 Homepage = "https://github.com/liyooh007/bazi-chart"
 Repository = "https://github.com/liyooh007/bazi-chart"
+Documentation = "https://github.com/liyooh007/bazi-chart#readme"
+"Online Demo" = "https://liyooh007.github.io/bazi-chart/demo.html"
+Issues = "https://github.com/liyooh007/bazi-chart/issues"
+Changelog = "https://github.com/liyooh007/bazi-chart/releases"
 
 [tool.setuptools.packages.find]
 include = ["bazi*"]

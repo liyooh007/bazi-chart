@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![Online Demo](https://img.shields.io/badge/▶_在线排盘-Demo-b8860b)](https://liyooh007.github.io/bazi-chart/demo.html)
 
+中文 ｜ [English](README.en.md)
+
 > 天文历实时推算节气 · 真太阳时跨时区自动换日柱 · 纯标准库离线运行
 >
 > 🌐 **不想安装？直接用浏览器在线排盘**：<https://liyooh007.github.io/bazi-chart/demo.html>
@@ -38,6 +40,24 @@
 - 💻 **跨平台**：Linux / Windows / macOS，树莓派 5 原生可跑
 - 🤖 **MCP server**：内置 `bazi-mcp`（JSON-RPC stdio，零依赖），4 个工具供 Claude Desktop 等 AI 客户端调用，只返回确定性排盘事实
 - 🔒 **纯本地离线**：无网络请求、无大模型调用、无第三方运行依赖
+
+### 与同类项目对比
+
+| 能力 | **bazi-chart（本项目）** | lunar-python | cantian/bazi-mcp | 多数 fork lunar 的八字库 |
+|---|---|---|---|---|
+| 语言 | 纯 Python（≥3.9，零依赖） | Python/JS 多语言 | TypeScript / Node | JS 为主 |
+| 历法内核 | **自研 VSOP87D 实时推算**，对照 JPL DE441 ≤1 分钟 | 公式/查表推算 | 依赖第三方农历库 | 直接 fork lunar |
+| 真太阳时 + 跨日换柱 | ✅ 东经/西经，自动重算日时柱 | 部分支持时差 | ✅ | 多数 ❌ 直接用输入时间 |
+| 四柱 / 藏干 / 十神 / 纳音 | ✅ | ✅（基础干支层） | ✅ | ✅ |
+| 上层推理：格局/用神/穷通/子平成败 | ✅ 多流派并列 | ❌（需自己写） | 较薄 | 参差 |
+| 大运 / 流年 / 流月 / 神煞 40+ | ✅ | 部分 | ✅ | 部分 |
+| MCP（AI Agent 直连） | ✅ 内置 `bazi-mcp`，`uvx` 一行起 | ❌ | ✅（Node） | ❌ |
+| 浏览器离线运行 | ✅ Pyodide 单页 Demo | — | — | — |
+| 安装 | `pip` / `uvx`，离线可跑 | 各包管理器 | 需 Node | 各异 |
+
+> 定位差异：**lunar-python 是优秀的「历法/干支基石」**，本项目不重复造这一层的轮子之争，
+> 而是用独立天文内核 + 完整子平上层推理 + MCP/Pyodide 分发，补「高精度四柱 + AI 可直连」这个位。
+> 数据事实部分欢迎用边界日期（跨年、节气交界、海外跨日）在 [Issue](https://github.com/liyooh007/bazi-chart/issues) 挑错。
 
 ---
 
@@ -143,7 +163,7 @@ bazi terms 2025                    # 2025 年 24 节气，精确到秒
 bazi lunar 2025-01-29              # 公历 → 农历
 bazi solar 2033 11 1 --leap        # 农历闰月 → 公历
 bazi poem 1990-05-12 14:30 -g 男   # 七言八句命理诗
-bazi verify                        # 34 项内置自检
+bazi verify                        # 41 项内置自检
 ```
 
 ---
