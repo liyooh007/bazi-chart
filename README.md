@@ -1,5 +1,7 @@
 # bazi-chart｜Python 四柱八字 CLI 排盘引擎
 
+<!-- mcp-name: io.github.liyooh007/bazi-chart -->
+
 [![PyPI version](https://img.shields.io/pypi/v/bazi-chart)](https://pypi.org/project/bazi-chart/)
 [![Python](https://img.shields.io/pypi/pyversions/bazi-chart)](https://pypi.org/project/bazi-chart/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)

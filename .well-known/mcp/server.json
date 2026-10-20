@@ -1,0 +1,39 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.liyooh007/bazi-chart",
+  "title": "bazi-chart",
+  "description": "Four Pillars of Destiny (BaZi) chart engine for the Chinese calendar: VSOP87D solar terms validated against JPL DE441 (<=1 min), true-solar-time with automatic cross-midnight pillar correction, lunar conversion, patterns/useful-god, shensha and major/annual/monthly luck. Pure Python standard library, fully offline; returns deterministic chart facts only.",
+  "version": "1.1.0",
+  "websiteUrl": "https://liyooh007.github.io/bazi-chart/demo.html",
+  "repository": {
+    "url": "https://github.com/liyooh007/bazi-chart",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "bazi-chart",
+      "version": "1.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "bazi-mcp"
+        }
+      ]
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "tool": "manual",
+      "version": "1.0.0",
+      "tools": ["bazi_chart", "bazi_liunian", "bazi_liuyue", "bazi_lunar"],
+      "license": "MIT",
+      "offline": true,
+      "language": ["zh-CN", "en"]
+    }
+  }
+}
