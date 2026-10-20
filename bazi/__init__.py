@@ -43,7 +43,7 @@
 
 from __future__ import annotations
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __all__ = [
     "BaziChart", "cast_pillars", "FourPillars", "Pillar",
     "wu_xing_balance", "day_master_strength", "useful_god", "Pattern",

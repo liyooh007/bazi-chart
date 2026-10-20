@@ -92,7 +92,7 @@ async function boot(){
   pyodide=await loadPyodide({indexURL:PY_INDEXURL});
   status('正在安装 bazi-chart…');
   // ponytail: 纯 Python wheel 即 zip，fetch 字节→zipfile 解压→sys.path，免 micropip（该发行版未内置）
-  const wresp=await fetch('./bazi_chart-1.1.0-py3-none-any.whl');
+  const wresp=await fetch('./bazi_chart-1.1.1-py3-none-any.whl');
   if(!wresp.ok) throw new Error('wheel 加载失败 HTTP '+wresp.status);
   pyodide.FS.writeFile('/tmp/bazi.whl', new Uint8Array(await wresp.arrayBuffer()));
   await pyodide.runPythonAsync(`
