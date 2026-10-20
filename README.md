@@ -1,6 +1,14 @@
 # bazi-chart｜Python 四柱八字 CLI 排盘引擎
 
+[![PyPI version](https://img.shields.io/pypi/v/bazi-chart)](https://pypi.org/project/bazi-chart/)
+[![Python](https://img.shields.io/pypi/pyversions/bazi-chart)](https://pypi.org/project/bazi-chart/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![Online Demo](https://img.shields.io/badge/▶_在线排盘-Demo-b8860b)](https://liyooh007.github.io/bazi-chart/demo.html)
+
 > 天文历实时推算节气 · 真太阳时跨时区自动换日柱 · 纯标准库离线运行
+>
+> 🌐 **不想安装？直接用浏览器在线排盘**：<https://liyooh007.github.io/bazi-chart/demo.html>
+> （Pyodide 在本地浏览器 WASM 运行，出生信息不上传）
 
 一个用 Python 从零实现的四柱八字排盘工具，重点解决很多开源库的共同短板：
 **把输入时间直接当作当地时间，忽略真太阳时，海外出生场景不会自动跨日期换日柱**。
@@ -206,7 +214,23 @@ bazi-mcp            # pip 安装后
 python -m bazi.mcp_server   # 源码目录
 ```
 
-Claude Desktop 配置：
+**用 uvx 零安装自动跟最新版（推荐）**：无需 clone、无需 pip install，每次从 PyPI 拉起：
+
+```bash
+uvx --from bazi-chart bazi-mcp
+```
+
+Claude Desktop 配置（uvx 方式）：
+
+```json
+{
+  "mcpServers": {
+    "bazi": { "command": "uvx", "args": ["--from", "bazi-chart", "bazi-mcp"] }
+  }
+}
+```
+
+已装 pip 的传统方式同样可用：
 
 ```json
 {
@@ -235,7 +259,7 @@ bazi verify
 python -m bazi verify
 ```
 
-当前自检覆盖 **34 项**，包括：
+当前自检覆盖 **41 项**，包括：
 
 - 240 个节气点与 JPL DE441 参考值偏差验证
 - 73,000+ 天农历公历往返验证
