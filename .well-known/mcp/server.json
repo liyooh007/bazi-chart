@@ -3,7 +3,7 @@
   "name": "io.github.liyooh007/bazi-chart",
   "title": "bazi-chart",
   "description": "Chinese BaZi Four Pillars engine: precise solar terms, true-solar-time, lunar, patterns, offline.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "websiteUrl": "https://liyooh007.github.io/bazi-chart/demo.html",
   "repository": {
     "url": "https://github.com/liyooh007/bazi-chart",
@@ -14,7 +14,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "bazi-chart",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "transport": {
         "type": "stdio"
       },
