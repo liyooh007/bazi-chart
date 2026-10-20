@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bazi-chart · 在线四柱排盘（浏览器本地运行）</title>
+<style>
+  :root{--bg:#faf7f0;--ink:#2b2620;--mut:#8a8175;--line:#e3dccb;--red:#a8321e;--gold:#b8860b;--card:#fffdf8;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:22px;margin:18px 0 4px}
+  h1 small{font-size:13px;color:var(--mut);font-weight:400}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:18px}
+  a{color:var(--red)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+  form{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;align-items:end}
+  label{font-size:12px;color:var(--mut);display:block;margin-bottom:3px}
+  input,select{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;font-size:15px;background:#fff;color:var(--ink)}
+  button{grid-column:1/-1;padding:11px;background:var(--red);color:#fff;border:0;border-radius:7px;font-size:16px;cursor:pointer}
+  button:disabled{background:#c9bfae;cursor:wait}
+  .row-check{grid-column:1/-1;font-size:13px;color:var(--mut);display:flex;gap:16px;flex-wrap:wrap}
+  #status{font-size:13px;color:var(--mut);min-height:20px}
+  h2{font-size:16px;margin:20px 0 8px;border-left:4px solid var(--red);padding-left:8px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  th{background:#f3ecdc;font-weight:600}
+  td.lab{background:#faf6ec;color:var(--mut);width:64px}
+  .pillars td.gan{font-size:22px;font-weight:700;color:var(--red)}
+  .pillars td.zhi{font-size:22px;font-weight:700}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:14px}
+  .kv .k{color:var(--mut)}
+  .wuxing{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .wx{padding:4px 12px;border-radius:20px;font-size:14px;border:1px solid var(--line)}
+  .wx b{font-size:16px}
+  .poem{white-space:pre-wrap;font-family:"Songti SC","SimSun",serif;background:#fdf9ef;border:1px dashed var(--gold);border-radius:8px;padding:12px;font-size:15px}
+  .score{font-size:28px;color:var(--red);font-weight:700}
+  details{margin-top:8px}
+  summary{cursor:pointer;color:var(--mut);font-size:13px}
+  pre{background:#2b2620;color:#e8e0d0;padding:12px;border-radius:8px;overflow:auto;font-size:12px;max-height:400px}
+  .hide{display:none}
+  .tag{display:inline-block;background:#f3ecdc;border-radius:4px;padding:1px 7px;margin:2px;font-size:12px}
+  footer{font-size:12px;color:var(--mut);margin-top:24px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>bazi-chart · 四柱八字排盘
+    <small>JPL DE441 精度 · VSOP87 节气 · 真太阳时</small>
+  </h1>
+  <div class="sub">
+    整个排盘在你浏览器里用 WebAssembly 运行，<b>不上传任何出生信息</b>。
+    <a href="index.html">项目介绍</a> ·
+    <a href="https://github.com/liyooh007/bazi-chart" target="_blank" rel="noopener">GitHub</a>
+  </div>
+
+  <div class="card">
+    <form id="f">
+      <div><label>公历年</label><input name="y" type="number" value="2000" min="1900" max="2050" required></div>
+      <div><label>月</label><input name="m" type="number" value="1" min="1" max="12" required></div>
+      <div><label>日</label><input name="d" type="number" value="1" min="1" max="31" required></div>
+      <div><label>时 (0-23)</label><input name="h" type="number" value="12" min="0" max="23" required></div>
+      <div><label>分</label><input name="mi" type="number" value="0" min="0" max="59"></div>
+      <div><label>性别</label><select name="g"><option>男</option><option>女</option></select></div>
+      <div><label>出生地经度（东经，留空不校正）</label><input name="lon" type="number" step="0.1" value="117" placeholder="如 济南117"></div>
+      <div class="row-check">
+        <label style="display:flex;align-items:center;gap:5px;color:var(--ink)">
+          <input type="checkbox" name="deep" style="width:auto">附带性格/事业/婚姻等传统断语段</label>
+      </div>
+      <button type="submit" id="go" disabled>正在加载排盘引擎…</button>
+    </form>
+    <div id="status"></div>
+  </div>
+
+  <div id="out" class="hide"></div>
+
+  <footer>
+    本工具仅为天文历法与 Python 工程演示；传统命理属民俗文化，<b>无科学预测效力，请勿用于重大决策</b>。
+  </footer>
+</div>
+
+<script src="https://unpkg.com/pyodide@0.26.4/pyodide.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+let pyodide=null;
+const status=t=>$('#status').textContent=t;
+const PY_INDEXURL='https://unpkg.com/pyodide@0.26.4/';
+
+// 一次加载引擎 + 本地 wheel（与 GitHub Pages 同目录）
+async function boot(){
+  status('首次加载约需下载运行时，请稍候…');
+  pyodide=await loadPyodide({indexURL:PY_INDEXURL});
+  status('正在安装 bazi-chart…');
+  // ponytail: 纯 Python wheel 即 zip，fetch 字节→zipfile 解压→sys.path，免 micropip（该发行版未内置）
+  const wresp=await fetch('./bazi_chart-1.1.0-py3-none-any.whl');
+  if(!wresp.ok) throw new Error('wheel 加载失败 HTTP '+wresp.status);
+  pyodide.FS.writeFile('/tmp/bazi.whl', new Uint8Array(await wresp.arrayBuffer()));
+  await pyodide.runPythonAsync(`
+    import zipfile, os, sys, json
+    os.makedirs('/tmp/pk', exist_ok=True)
+    with zipfile.ZipFile('/tmp/bazi.whl') as _z: _z.extractall('/tmp/pk')
+    sys.path.insert(0, '/tmp/pk')
+    from bazi import BaziChart
+    def _pa(y,m,d,h,mi,g,lon,deep):
+        kw=dict(year=int(y),month=int(m),day=int(d),hour=int(h),minute=int(mi),gender=g)
+        if lon is not None and lon!='': kw['longitude']=float(lon)
+        c=BaziChart(**kw)
+        return json.dumps(c.to_dict(deep=bool(deep)), ensure_ascii=False, default=str)
+  `);
+  $('#go').textContent='排盘';$('#go').disabled=false;status('引擎就绪。输入出生信息后点「排盘」。');
+}
+
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function render(j){
+  const bi=j['基本信息'], ss=j['四柱'], wx=j['五行力量'], pat=j['格局用神'],
+        str=j['旺衰'], qy=j['起运'], rate=j['命局评分'], poem=j['命理诗'],
+        dayun=j['大运']||[], shen=j['神煞']||{};
+  const P=ss['四柱']||bi['四柱'], NY=ss['纳音']||bi['纳音'];
+  const labels=['年柱','月柱','日柱','时柱'];
+  const gan=ss['天干']||{}, zhi=ss['地支']||{};
+  const gkeys=['年干','月干','日干','时干'];
+  let pillarRows='';
+  // P 形如 ["丙午","戊戌",...]
+  const gz=P.map(s=>[s[0],s[1]]);
+  pillarRows=`<tr><td class="lab">天干</td>${gz.map((x,i)=>`<td class="gan">${x[0]}</td>`).join('')}</tr>
+   <tr><td class="lab">地支</td>${gz.map(x=>`<td class="zhi">${x[1]}</td>`).join('')}</tr>`;
+  const nayinRow=`<tr><td class="lab">纳音</td>${NY.map(x=>`<td style="font-size:12px">${esc(x)}</td>`).join('')}</tr>`;
+  const wxCfg={木:'#2e7d32',火:'#c62828',土:'#8d6e63',金:'#b8860b',水:'#1565c0'};
+  const wxHtml=Object.entries(wx).map(([k,v])=>
+    `<span class="wx" style="color:${wxCfg[k]}">${k} <b>${(+v).toFixed(1)}%</b></span>`).join('');
+  const dyRows=dayun.map(x=>`<tr><td>${esc(x['干支'])}</td><td>${x['起岁']}–${x['止岁']}</td>
+    <td>${x['起年']}–${x['止年']}</td><td>${esc(x['十神'])}</td><td>${esc(x['地支十神'])}</td>
+    <td>${(+x['评分']).toFixed(2)}</td></tr>`).join('');
+  const shenJi=(shen['吉']||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('');
+  const shenZhong=(shen['中']||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('');
+
+  $('#out').innerHTML=`
+  <div class="card">
+    <h2>基本信息</h2>
+    <div class="kv">
+      <span class="k">公历</span><span>${esc(bi['公历'])}</span>
+      <span class="k">农历</span><span>${esc(bi['农历'])}</span>
+      <span class="k">生肖/星座</span><span>${esc(bi['生肖'])} / ${esc(bi['星座'])}</span>
+      <span class="k">真太阳时</span><span>${esc(bi['真太阳时'])}（${esc(bi['时区'])}）· 日主 <b style="color:var(--red)">${esc(bi['日主'])}</b>火</span>
+      <span class="k">旬空</span><span>${(bi['旬空']||[]).join('、')}</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>四柱</h2>
+    <table class="pillars">
+      <tr><td class="lab"></td>${labels.map(l=>`<th>${l}</th>`).join('')}</tr>
+      ${pillarRows}${nayinRow}
+    </table>
+  </div>
+  <div class="card">
+    <h2>五行力量</h2><div class="wuxing">${wxHtml}</div>
+    <div class="kv">
+      <span class="k">旺衰</span><span>${esc(str['de_ling']||'')}，综合 <b>${(+str['score']).toFixed(1)}</b> 分${(+str['score'])>=55?'（偏旺）':'（中和/偏弱）'}</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>格局 · 用神</h2>
+    <div class="kv">
+      <span class="k">格局</span><span><b>${esc(pat['格局'])}</b>（${esc(pat['类别'])}）— ${esc((pat['取格依据']||''))}</span>
+      <span class="k">用神</span><span style="color:var(--red);font-weight:700">${esc(pat['用神'])}</span>
+      <span class="k">喜神</span><span>${(pat['喜神']||[]).join('、')||'—'}</span>
+      <span class="k">忌神</span><span>${(pat['忌神']||[]).join('、')||'—'}</span>
+      <span class="k">穷通宝鉴</span><span>${esc((j['穷通宝鉴调候']||{})['raw']||'')}（首取 ${esc((j['穷通宝鉴调候']||{})['primary']||'')}）</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>神煞</h2><div>${shenJi}${shenZhong||''}</div>
+  </div>
+  <div class="card">
+    <h2>起运 · 大运</h2>
+    <div class="kv" style="margin-bottom:8px">
+      <span class="k">起运</span><span>${esc(qy['起运岁数'])} 岁，${esc(qy['交运时刻'])}</span>
+    </div>
+    <table><tr><th>大运</th><th>年龄</th><th>公历</th><th>天干十神</th><th>地支十神</th><th>评分</th></tr>${dyRows}</table>
+  </div>
+  <div class="card">
+    <h2>命理诗 · 评分 <span class="score">${(+rate['总分']).toFixed(1)}</span> <small style="font-size:13px;color:var(--mut)">${esc(rate['评级'])}</small></h2>
+    <div class="poem">${esc(poem['命理诗']||'')}</div>
+    <div class="sub" style="margin-top:6px">${esc(poem['总断']||'')}</div>
+    <details><summary>查看完整结构化数据（JSON，供开发者接入）</summary><pre>${esc(JSON.stringify(j,null,2))}</pre></details>
+  </div>`;
+  $('#out').classList.remove('hide');
+}
+
+$('#f').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=new FormData(e.target);
+  const go=$('#go');go.disabled=true;go.textContent='排盘中…';
+  try{
+    status('本地计算中…');
+    const pa=pyodide.globals.get('_pa');
+    const json=pa(f.get('y'),f.get('m'),f.get('d'),f.get('h'),f.get('mi'),
+                  f.get('g'),f.get('lon'),f.get('deep')?1:0);
+    render(JSON.parse(json));
+    status('完成：全程本地计算，未联网、未上传。');
+  }catch(err){status('排盘失败：'+(err.message||err));}
+  go.disabled=false;go.textContent='排盘';
+});
+
+boot().catch(e=>{status('加载失败：'+(e.message||e));$('#go').disabled=false;$('#go').textContent='重试排盘';});
+</script>
+</body>
+</html>
