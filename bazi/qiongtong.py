@@ -110,8 +110,10 @@ def qiongtong(day_gan: str, month_zhi: str) -> dict:
     ranks = _parse(raw)
     primary = ranks[0][1][0] if ranks and ranks[0][1] else ""
     assist = [g for _, gs in ranks[1:] for g in gs]
+    # raw 里的“_”是内部条件标记（如夜生），不展示给用户：按解析结果重建干净串
+    display = "".join(str(r) + "".join(gs) for r, gs in ranks)
     return {"key": key, "primary": primary, "assist": assist,
-            "ranks": ranks, "raw": raw}
+            "ranks": ranks, "raw": display}
 
 
 def all_cells() -> int:
